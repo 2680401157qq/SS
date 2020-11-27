@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mecol.dormitory.dao.ClassDao">
+
+    <resultMap id="classResultMap" type="com.mecol.dormitory.entity.Class">
+        <id property="classId" column="classId"/>
+        <result property="className" column="className"/>
+        <result property="classNote" column="classNote"/>
+
+        <collection property="studentList" javaType="ArrayList"
+                    column="classId" ofType="com.mecol.dormitory.entity.Student"
+                    select="com.mecol.dormitory.dao.StudentDao.getStudentByClassId"
+                    fetchType="eager"><!--这里如果是lazy 懒加载会造成json异常-->
+            <id property="id" column="id"/>
+            <!--只查询了课程名称-->
+            <result property="username" column="username"/>
+
+        </collection>
+    </resultMap>
+
+    <select id="getClassList" resultMap="classResultMap">
+        select *
+        from tb_class
+    </select>
+
+    <delete id="deleteByClassId">
+        delete from tb_class where classId=#{classId}
+    </delete>
+
+
+    <select id="getAllClasses" resultType="com.mecol.dormitory.entity.Class">
+        select * from tb_class
+    </select>
+
+    <select id="getClassById" resultType="com.mecol.dormitory.entity.Class">
+        select * from tb_class where classId=#{classId}
+    </select>
+
+    <select id="getClassByClassName" resultType="com.mecol.dormitory.entity.Class">
+        select * from tb_class where className=#{className}
+    </select>
+
+    <update id="updClass" parameterType="com.mecol.dormitory.entity.Class">
+        update tb_class
+        <set>
+            <if test="className!=null">
+                className=#{className},
+            </if>
+            <if test="classNote!=null">
+                classNote=#{classNote}
+            </if>
+        </set>
+        where classId=#{classId}
+    </update>
+
+    <insert id="insertClass" parameterType="com.mecol.dormitory.entity.Class">
+        insert into tb_class(className,classNote)
+        values (#{className},#{classNote})
+    </insert>
+</mapper>
